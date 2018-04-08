@@ -827,6 +827,17 @@ public class TelephonyManager {
             "android.telephony.event.EVENT_HANDOVER_VIDEO_FROM_WIFI_TO_LTE";
 
     /**
+     * {@link android.telecom.Connection} event used to indicate that an IMS call has be
+     * successfully handed over from LTE to WIFI.
+     * <p>
+     * Sent via {@link android.telecom.Connection#sendConnectionEvent(String, Bundle)}.
+     * The {@link Bundle} parameter is expected to be null when this connection event is used.
+     * @hide
+     */
+    public static final String EVENT_HANDOVER_VIDEO_FROM_LTE_TO_WIFI =
+            "android.telephony.event.EVENT_HANDOVER_VIDEO_FROM_LTE_TO_WIFI";
+
+    /**
      * {@link android.telecom.Connection} event used to indicate that an IMS call failed to be
      * handed over from LTE to WIFI.
      * <p>
@@ -1716,6 +1727,8 @@ public class TelephonyManager {
     public static final int NETWORK_TYPE_IWLAN = 18;
     /** Current network is LTE_CA {@hide} */
     public static final int NETWORK_TYPE_LTE_CA = 19;
+    /** Current network is DC_HSPAP {@hide} */
+    public static final int NETWORK_TYPE_DC_HSPAP = 20;
     /**
      * @return the NETWORK_TYPE_xxxx for current data connection.
      */
@@ -1910,6 +1923,7 @@ public class TelephonyManager {
             case NETWORK_TYPE_EVDO_B:
             case NETWORK_TYPE_EHRPD:
             case NETWORK_TYPE_HSPAP:
+            case NETWORK_TYPE_DC_HSPAP:
             case NETWORK_TYPE_TD_SCDMA:
                 return NETWORK_CLASS_3_G;
             case NETWORK_TYPE_LTE:
@@ -1980,6 +1994,8 @@ public class TelephonyManager {
                 return "IWLAN";
             case NETWORK_TYPE_LTE_CA:
                 return "LTE_CA";
+            case NETWORK_TYPE_DC_HSPAP:
+                return "DC-HSPA+";
             default:
                 return "UNKNOWN";
         }

@@ -4399,6 +4399,7 @@ public final class Settings {
          * 1 = Statusbar only
          * 2 = Navbar only
          * 3 = Fullscreen
+         * @hide
          */
         public static final String IMMERSIVE_RECENTS = "immersive_recents";
 
@@ -4406,6 +4407,7 @@ public final class Settings {
          * 0 - wallpaper based
          * 1 - force light
          * 2 - force dark
+         * 3 - force blackaf
          * @hide
          */
         public static final String SYSTEM_UI_THEME = "system_ui_theme";
@@ -4551,6 +4553,7 @@ public final class Settings {
          * Ticker animation
          * 0: Fade animation
          * 1: Scrolling ticker
+         * @hide
          */
         public static final String STATUS_BAR_TICKER_ANIMATION_MODE =
                 "status_bar_ticker_animation_mode";
@@ -4637,7 +4640,65 @@ public final class Settings {
             LOCK_TO_APP_ENABLED,
             NOTIFICATION_SOUND,
             ACCELEROMETER_ROTATION,
+            VOLUME_BUTTON_MUSIC_CONTROL,
+            LOCKSCREEN_BATTERY_INFO,
+            STATUS_BAR_SHOW_TICKER,
+            SHOW_CLEAR_ALL_RECENTS,
+            RECENTS_CLEAR_ALL_LOCATION,
+            POWERMENU_REBOOT,
+            POWERMENU_ADVANCED_REBOOT,
+            POWERMENU_SCREENSHOT,
+            POWERMENU_AIRPLANE,
+            POWERMENU_LOCKSCREEN,
+            HEADSET_CONNECT_PLAYER,
+            BATTERY_LIGHT_ENABLED,
+            BATTERY_LIGHT_ALLOW_ON_DND,
+            BATTERY_LIGHT_LOW_BLINKING,
+            BATTERY_LIGHT_LOW_COLOR,
+            BATTERY_LIGHT_MEDIUM_COLOR,
+            BATTERY_LIGHT_FULL_COLOR,
+            BATTERY_LIGHT_REALLYFULL_COLOR,
+            VOLUME_ROCKER_WAKE,
+            FINGERPRINT_SUCCESS_VIB,
+            STATUS_BAR_LOGO,
+            STATUS_BAR_SHOW_CARRIER,
+            CUSTOM_CARRIER_LABEL,
+            QS_QUICKBAR_SCROLL_ENABLED,
+            QS_LAYOUT_COLUMNS_LANDSCAPE,
+            QS_LAYOUT_COLUMNS,
+            QS_TILE_TITLE_VISIBILITY,
+            QS_LAYOUT_ROWS,
+            SCREENSHOT_DEFAULT_MODE,
+            VOLUME_LINK_NOTIFICATION,
+            WAKE_WHEN_PLUGGED_OR_UNPLUGGED,
+            SCREEN_OFF_ANIMATION,
+            HIDE_LOCKSCREEN_DATE,
+            HIDE_LOCKSCREEN_CLOCK,
+            HIDE_LOCKSCREEN_ALARM,
+            FORCE_AMBIENT_FOR_MEDIA,
+            POWERMENU_LS_ADVANCED_REBOOT,
+            POWERMENU_LS_SCREENSHOT,
+            POWERMENU_LS_AIRPLANE,
+            POWERMENU_LS_REBOOT,
+            NOTIFICATION_SOUND_VIB_SCREEN_ON,
+            MUTE_ANNOYING_NOTIFICATIONS_THRESHOLD,
+            LOCKSCREEN_QUICK_UNLOCK_CONTROL,
+            IMMERSIVE_RECENTS,
+            SYSTEM_UI_THEME,
+            HIDE_FROM_RECENTS_LIST,
+            VOLUME_ADJUST_SOUNDS_ENABLED,
+            ANBI_ENABLED,
             SHOW_BATTERY_PERCENT,
+            SHOW_LTE_FOURGEE,
+            SCREENRECORD_QUALITY_MODE,
+            NOTIFICATION_GUTS_KILL_APP_BUTTON,
+            SHOW_USB_MODE_DIALOG,
+            STATUS_BAR_TICKER_ANIMATION_MODE,
+            VOLUME_KEY_CURSOR_CONTROL,
+            ANIM_TILE_STYLE,
+            ANIM_TILE_DURATION,
+            QS_PANEL_BG_ALPHA,
+            SCREENSHOT_EDIT_USER_APP,
             STATUS_BAR_CLOCK,
             STATUSBAR_CLOCK_STYLE,
             STATUS_BAR_CLOCK_SECONDS,
@@ -4655,6 +4716,62 @@ public final class Settings {
          */
         public static final String[] LEGACY_RESTORE_SETTINGS = {
         };
+
+       /**
+         * Enable looking up of phone numbers of nearby places
+         *
+         * @hide
+         */
+        public static final String ENABLE_FORWARD_LOOKUP = "enable_forward_lookup";
+
+        /**
+         * Enable looking up of phone numbers of people
+         *
+         * @hide
+         */
+        public static final String ENABLE_PEOPLE_LOOKUP = "enable_people_lookup";
+
+        /**
+         * Enable looking up of information of phone numbers not in the contacts
+         *
+         * @hide
+         */
+        public static final String ENABLE_REVERSE_LOOKUP = "enable_reverse_lookup";
+
+        /**
+         * The forward lookup provider
+         *
+         * @hide
+         */
+        public static final String FORWARD_LOOKUP_PROVIDER = "forward_lookup_provider";
+
+        /**
+         * The people lookup provider
+         *
+         * @hide
+         */
+        public static final String PEOPLE_LOOKUP_PROVIDER = "people_lookup_provider";
+
+        /**
+         * The reverse lookup provider
+         *
+         * @hide
+         */
+        public static final String REVERSE_LOOKUP_PROVIDER = "reverse_lookup_provider";
+
+        /**
+         * The OpenCNAM paid account ID
+         *
+         * @hide
+         */
+        public static final String DIALER_OPENCNAM_ACCOUNT_SID = "dialer_opencnam_account_sid";
+
+        /**
+         * The OpenCNAM authentication token
+         *
+         * @hide
+         */
+        public static final String DIALER_OPENCNAM_AUTH_TOKEN = "dialer_opencnam_auth_token";
 
         /**
          * These are all public system settings
@@ -8193,11 +8310,12 @@ public final class Settings {
         /**
          * Display style of the status bar battery information
          * 0: Display the battery an icon in portrait mode
-         * 1: Display the battery as a circle
-         * 2: Display the battery as a dotted circle
-         * 3: Display the battery as a square
-         * 4: Display the battery as text
-         * 5: Do not display the battery
+         * 1: Display the battery an icon in landscape mode
+         * 2: Display the battery as a circle
+         * 3: Display the battery as a dotted circle
+         * 4: Display the battery as a square
+         * 5: Display the battery as text
+         * 6: Do not display the battery
          * default: 0
          * @hide
          */
@@ -8313,7 +8431,17 @@ public final class Settings {
             SCREENSAVER_COMPONENTS,
             SCREENSAVER_ACTIVATE_ON_DOCK,
             SCREENSAVER_ACTIVATE_ON_SLEEP,
+            NAVIGATION_BAR_MODE,
+            FLING_GESTURE_ACTIONS,
+            SMARTBAR_DOUBLETAP_SLEEP,
+            HARDWARE_KEYS_DISABLE,
+            FP_SWIPE_TO_DISMISS_NOTIFICATIONS,
+            PULSE_AUTO_COLOR,
+            LOCK_QS_DISABLED,
+            LOCKSCREEN_VISUALIZER_ENABLED,
+            FACE_AUTO_UNLOCK,
             STATUS_BAR_BATTERY_STYLE,
+            FORCE_AUTHORIZE_SUBSTRATUM_PACKAGES
         };
 
         /** @hide */
@@ -11442,7 +11570,11 @@ public final class Settings {
             DOCK_AUDIO_MEDIA_ENABLED,
             ENCODED_SURROUND_OUTPUT,
             LOW_POWER_MODE_TRIGGER_LEVEL,
-            BLUETOOTH_ON
+            BLUETOOTH_ON,
+            RINGTONE_FOCUS_MODE,
+            POWER_NOTIFICATIONS_VIBRATE,
+            USB_DEFAULT_CONFIGURATION,
+            USB_PARANOIA_CONNECT
         };
 
         /** @hide */

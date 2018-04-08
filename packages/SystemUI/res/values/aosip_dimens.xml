@@ -18,6 +18,9 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
+    <!-- Recents task locking button -->
+    <dimen name="recents_task_view_header_lock_button_padding">44dp</dimen>
+
     <!-- Floating action button -->
     <dimen name="floating_action_button_height">54dp</dimen>
     <dimen name="floating_action_button_width">54dp</dimen>
@@ -62,4 +65,5 @@
     <!-- QS detail view scrolling -->
    <dimen name="qs_detail_item_height_twoline">72dp</dimen>
 
+    <dimen name="qs_corner_content_padding">8dp</dimen>
 </resources>

@@ -2154,6 +2154,13 @@
         android:description="@string/permdesc_getPackageSize"
         android:protectionLevel="normal" />
 
+    <!-- @hide Allows an application to change the package signature as
+         seen by applications -->
+    <permission android:name="android.permission.FAKE_PACKAGE_SIGNATURE"
+        android:protectionLevel="dangerous"
+        android:label="@string/permlab_fakePackageSignature"
+        android:description="@string/permdesc_fakePackageSignature" />
+
     <!-- @deprecated No longer useful, see
          {@link android.content.pm.PackageManager#addPackageToPreferred}
          for details. -->
@@ -3576,6 +3583,11 @@
         android:description="@string/permdesc_toggleNavigationEditor"
         android:protectionLevel="signatureOrSystem" />
  
+    <!-- Allows an application to override the power key action
+         @hide <p>Not for use by third-party applications. -->
+    <permission android:name="android.permission.PREVENT_POWER_KEY"
+        android:protectionLevel="signature|privileged" />
+
     <application android:process="system"
                  android:persistent="true"
                  android:hasCode="false"
