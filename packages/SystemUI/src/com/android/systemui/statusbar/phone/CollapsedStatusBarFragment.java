@@ -175,6 +175,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
             ((Clock)mClock).updateSettings();
             ((Clock)mCenterClock).updateSettings();
             ((Clock)mLeftClock).updateSettings();
+            ((Clock)mCenterClock).updateSettings();
             updateSettings(true);
             mStatusBarComponent.updateQsbhClock();
             mStatusBarComponent.updateBatterySettings();
@@ -355,6 +356,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
 
     public void hideSystemIconArea(boolean animate) {
         animateHide(mSystemIconArea, animate, true);
+        if (((Clock)mCenterClock).isEnabled()) {
+        animateHide(mCenterClockLayout, animate,false);
+        }
         if (mShowLogo == 2) {
             animateHide(mAOSiPLogoRight, animate, false);
         }
@@ -363,6 +367,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
 
     public void showSystemIconArea(boolean animate) {
         animateShow(mSystemIconArea, animate);
+        if (((Clock)mCenterClock).isEnabled()) {
+        animateShow(mCenterClockLayout, animate);
+        }
         if (mShowLogo == 2) {
             animateShow(mAOSiPLogoRight, animate);
         }
@@ -374,7 +381,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         if (mShowLogo == 1) {
             animateHide(mAOSiPLogo, animate, false);
         }
+        if (((Clock)mCenterClock).isEnabled()) {
         animateHide(mCenterClockLayout, animate,false);
+        }
         if (((Clock)mLeftClock).isEnabled()) {
             animateHide(mLeftClock, animate, true);
         }
@@ -385,7 +394,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         if (mShowLogo == 1) {
             animateShow(mAOSiPLogo, animate);
         }
+        if (((Clock)mCenterClock).isEnabled()) {
         animateShow(mCenterClockLayout, animate);
+        }
         if (((Clock)mLeftClock).isEnabled()) {
             animateShow(mLeftClock, animate);
         }

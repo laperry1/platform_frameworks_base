@@ -3242,6 +3242,23 @@ public class StatusBar extends SystemUI implements DemoMode,
     @Override
     public void handleSystemKey(int key) {
         if (SPEW) Log.d(TAG, "handleNavigationKey: " + key);
+
+        if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == key || KeyEvent.KEYCODE_MEDIA_NEXT == key) {
+            if (mMediaSessionManager != null) {
+                final List<MediaController> sessions
+                        = mMediaSessionManager.getActiveSessionsForUser(
+                                null,
+                                UserHandle.USER_ALL);
+                for (MediaController aController : sessions) {
+                    if (PlaybackState.STATE_PLAYING ==
+                            getMediaControllerPlaybackState(aController)) {
+                        triggerKeyEvents(key, aController);
+                        break;
+                    }
+                }
+            }
+            return;
+        }
         if (!panelsEnabled() || !mKeyguardMonitor.isDeviceInteractive()
                 || mKeyguardMonitor.isShowing() && !mKeyguardMonitor.isOccluded()) {
             return;
@@ -3269,7 +3286,24 @@ public class StatusBar extends SystemUI implements DemoMode,
                 clearAllNotifications(KeyEvent.KEYCODE_SYSTEM_NAVIGATION_LEFT == key ? true : false);
             }
         }
+    }
 
+    private void triggerKeyEvents(int key, MediaController controller) {
+        long when = SystemClock.uptimeMillis();
+        final KeyEvent evDown = new KeyEvent(when, when, KeyEvent.ACTION_DOWN, key, 0);
+        final KeyEvent evUp = KeyEvent.changeAction(evDown, KeyEvent.ACTION_UP);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                controller.dispatchMediaButtonEvent(evDown);
+            }
+        });
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                controller.dispatchMediaButtonEvent(evUp);
+            }
+        }, 20);
     }
 
     boolean panelsEnabled() {
@@ -3840,7 +3874,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                 inAnim = loadAnim(false, null);
             }
             mStatusBarContent.setVisibility(View.GONE);
-            mStatusBarContent.startAnimation(loadAnim(true, null));
+            mStatusBarContent.startAnimation(outAnim);
             mCenterClockLayout.setVisibility(View.GONE);
             mCenterClockLayout.startAnimation(loadAnim(true, null));
             if (mTickerView != null) {
@@ -3860,7 +3894,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                 inAnim = loadAnim(false, null);
             }
             mStatusBarContent.setVisibility(View.VISIBLE);
-            mStatusBarContent.startAnimation(loadAnim(false, null));
+            mStatusBarContent.startAnimation(inAnim);
             mCenterClockLayout.setVisibility(View.VISIBLE);
             mCenterClockLayout.startAnimation(loadAnim(false, null));
             if (mTickerView != null) {

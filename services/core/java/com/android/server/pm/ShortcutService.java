@@ -59,6 +59,7 @@ import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.SystemProperties;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileUtils;
@@ -1181,6 +1182,8 @@ public class ShortcutService extends IShortcutService.Stub {
             if (userPackages == null) {
                 userPackages = new ShortcutUser(this, userId);
             }
+
+            userPackages.initKnownLocales();
             mUsers.put(userId, userPackages);
 
             // Also when a user's data is first accessed, scan all packages.
@@ -3922,7 +3925,7 @@ public class ShortcutService extends IShortcutService.Stub {
     // Injection point.
     @VisibleForTesting
     String injectBuildFingerprint() {
-        return Build.FINGERPRINT;
+        return SystemProperties.get("ro.build.date", Build.FINGERPRINT);
     }
 
     final void wtf(String message) {
