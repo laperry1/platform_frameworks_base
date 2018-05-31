@@ -4132,6 +4132,24 @@ public final class Settings {
         public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
 
         /**
+         * Whether the phone vibrates on call connect
+         * @hide
+         */
+        public static final String VIBRATE_ON_CONNECT = "vibrate_on_connect";
+
+        /**
+         * Whether the phone vibrates on call waiting
+         * @hide
+         */
+        public static final String VIBRATE_ON_CALLWAITING = "vibrate_on_callwaiting";
+
+        /**
+         * Whether the phone vibrates on disconnect
+         * @hide
+         */
+        public static final String VIBRATE_ON_DISCONNECT = "vibrate_on_disconnect";
+
+        /**
          * Wheter to show network traffic indicator in statusbar
          * @hide
          */
@@ -4360,12 +4378,6 @@ public final class Settings {
          * @hide
          */
         public static final String CUSTOM_CARRIER_LABEL = "custom_carrier_label";
-
-        /**
-         * Whether to enable scrolling in the small quick settings
-         * @hide
-         */
-        public static final String QS_QUICKBAR_SCROLL_ENABLED = "qs_quickbar_scroll_enabled";
 
         /**
          * @hide
@@ -4628,6 +4640,12 @@ public final class Settings {
         public static final String DATA_DISABLED_ICON = "data_disabled_icon";
 
         /**
+         * Apps to hide in the ChooserActivity
+         * @hide
+         */
+        public static final String CHOOSER_ACTIVITY_BLACKLIST = "chooser_activity_blacklist";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
@@ -4706,7 +4724,6 @@ public final class Settings {
             STATUS_BAR_LOGO,
             STATUS_BAR_SHOW_CARRIER,
             CUSTOM_CARRIER_LABEL,
-            QS_QUICKBAR_SCROLL_ENABLED,
             QS_LAYOUT_COLUMNS_LANDSCAPE,
             QS_LAYOUT_COLUMNS,
             QS_TILE_TITLE_VISIBILITY,
@@ -4927,7 +4944,6 @@ public final class Settings {
             PRIVATE_SETTINGS.add(BATTERY_LIGHT_LOW_BLINKING);
             PRIVATE_SETTINGS.add(LESS_BORING_HEADS_UP);
             PRIVATE_SETTINGS.add(STATUS_BAR_LOGO);
-            PRIVATE_SETTINGS.add(QS_QUICKBAR_SCROLL_ENABLED);
             PRIVATE_SETTINGS.add(QS_LAYOUT_COLUMNS);
             PRIVATE_SETTINGS.add(QS_LAYOUT_COLUMNS_LANDSCAPE);
             PRIVATE_SETTINGS.add(QS_TILE_TITLE_VISIBILITY);
