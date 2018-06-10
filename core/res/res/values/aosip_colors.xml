@@ -16,6 +16,17 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
+    <!-- Generic colors -->
+    <color name="generic_theme_primary">#4285f4</color>
+    <color name="generic_theme_primary_dark">#346AC3</color>
+    <color name="generic_theme_accent">#3B77DB</color>
+
+    <!-- Custom Analog clock -->
+    <color name="analog_clock_border_color">#212121</color>
+    <color name="analog_clock_face_color">#FFFFFF</color>
+    <color name="analog_clock_hand_hour_color">@*android:color/accent_device_default_light</color>
+    <color name="analog_clock_hand_minute_color">#212121</color>
+
     <!-- Settings icon tint color -->
     <color name="settings_icon_tint_color">#737373</color>
 
@@ -67,5 +78,8 @@
     <color name="notification_gear_color">#ff757575</color>
     <color name="notification_guts_bg_color">#eeeeee</color>
     <color name="notification_snooze_text">#dd000000</color>
+
+    <!-- Two target preference vertical divider color -->
+    <color name="list_divider_dark">#64000000</color>
 
 </resources>

@@ -4057,10 +4057,46 @@ public final class Settings {
          */
 
         /**
+         * Whether to display the wallpaper tint on the power menu
+         * @hide
+         */
+        public static final String WALLPAPER_POWER_MENU_TINT = "wallpaper_power_menu_tint";
+
+        /**
+         * Whether to display the wallpaper tint in recents
+         * @hide
+         */
+        public static final String WALLPAPER_RECENTS_TINT = "wallpaper_recents_tint";
+
+        /**
+         * Whether to display the wallpaper tint in the notification shade
+         * @hide
+         */
+        public static final String WALLPAPER_NOTIFICATION_SHADE_WALLPAPER_TINT = "wallpaper_notification_shade_wallpaper_tint";
+
+        /**
+         * Whether to display the wallpaper tint in the keyguard
+         * @hide
+         */
+        public static final String WALLPAPER_KEYGUARD_WALLPAPER_TINT = "wallpaper_keyguard_wallpaper_tint";
+
+        /**
          * Hide lockscreen date
          * @hide
          */
         public static final String HIDE_LOCKSCREEN_DATE = "hide_lockscreen_date";
+
+        /**
+         * Select which lockscreen date style to display
+         * @hide
+         */
+        public static final String LOCKSCREEN_DATE_SELECTION = "lockscreen_date_selection";
+
+        /**
+         * Select which lockscreen clock style to display
+         * @hide
+         */
+        public static final String LOCKSCREEN_CLOCK_SELECTION = "lockscreen_clock_selection";
 
         /**
          * Hide lockscreen clock
@@ -4275,6 +4311,12 @@ public final class Settings {
          * @hide
          */
         public static final String HEADS_UP_BLACKLIST_VALUES = "heads_up_blacklist_values";
+
+        /**
+         * Show the pending notification counts as overlays on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
 
         /**
          * Whether to launch default music player when headset plugged in

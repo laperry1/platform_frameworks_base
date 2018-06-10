@@ -16,6 +16,27 @@
 <resources>
   <java-symbol type="bool" name="config_useSystemClockforRotationSensor" />
 
+  <!-- Generic colors -->
+  <java-symbol type="color" name="generic_theme_primary" />
+  <java-symbol type="color" name="generic_theme_primary_dark" />
+  <java-symbol type="color" name="generic_theme_accent" />
+
+  <!-- Custom Analog clock -->
+  <java-symbol type="drawable" name="custom_clock_dial" />
+  <java-symbol type="drawable" name="custom_clock_dial_ambient" />
+  <java-symbol type="drawable" name="custom_clock_hand_hour" />
+  <java-symbol type="drawable" name="custom_clock_hand_minute" />
+  <java-symbol type="color" name="analog_clock_border_color" />
+  <java-symbol type="color" name="analog_clock_face_color" />
+  <java-symbol type="color" name="analog_clock_hand_hour_color" />
+  <java-symbol type="color" name="analog_clock_hand_minute_color" />
+
+  <!-- DeadPool Analog clock -->
+  <java-symbol type="drawable" name="deadpool_clock_dial" />
+  <java-symbol type="drawable" name="deadpool_clock_dial_ambient" />
+  <java-symbol type="drawable" name="deadpool_clock_hand_hour" />
+  <java-symbol type="drawable" name="deadpool_clock_hand_minute" />
+
   <!-- Settings icon tint color -->
   <java-symbol type="color" name="settings_icon_tint_color" />
 
@@ -114,4 +135,7 @@
   <java-symbol type="color" name="tooltip_text_light" />
   <java-symbol type="color" name="tooltip_text_dark" />
 
+  <!-- Full screen aspect ratio -->
+  <java-symbol type="bool" name="config_haveHigherAspectRatioScreen" />
+  <java-symbol type="dimen" name="config_screenAspectRatio" />
 </resources>
