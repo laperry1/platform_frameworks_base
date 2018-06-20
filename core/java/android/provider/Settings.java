@@ -4337,6 +4337,12 @@ public final class Settings {
         public static final String HEADS_UP_BLACKLIST_VALUES = "heads_up_blacklist_values";
 
         /**
+         * Sensor block per-package
+         * @hide
+         */
+        public static final String SENSOR_BLOCK = "sensor_block";
+
+        /**
          * Show the pending notification counts as overlays on the status bar
          * @hide
          */
@@ -4492,8 +4498,7 @@ public final class Settings {
          * Force an Ambient notification when a new media track is being played
          * 0 - disabled
          * 1 - show track info within normal Ambient Display notifications
-         * 2 - show track info within normal Ambient Display and also force new notifications when skipping tracks
-         * 3 - like 2, but for forced notifications use a clean layout with hidden clock
+         * 2 - show track info within normal Ambient Display and force a new Ambient clean layout when skipping tracks
          * @hide
          */
         public static final String FORCE_AMBIENT_FOR_MEDIA = "force_ambient_for_media";
@@ -4642,6 +4647,12 @@ public final class Settings {
         public static final String SCREEN_STATE_MOBILE_DATA = "screen_state_mobile_data";
 
         /**
+         * Whether to control brightness from status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
+
+        /**
          * @hide
          */
         public static final String SCREEN_STATE_OFF_DELAY = "screen_state_off_delay";
@@ -4710,6 +4721,13 @@ public final class Settings {
          * @hide
          */
         public static final String CHOOSER_ACTIVITY_BLACKLIST = "chooser_activity_blacklist";
+
+        /**
+         * Which recents style to use
+         * @hide
+         */
+        public static final String RECENTS_LAYOUT_STYLE = "recents_layout_style";
+
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -5030,6 +5048,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_FORMAT);
             PRIVATE_SETTINGS.add(SHOW_LTE_FOURGEE);
             PRIVATE_SETTINGS.add(TOAST_ICON);
+            PRIVATE_SETTINGS.add(STATUS_BAR_BRIGHTNESS_CONTROL);
         }
 
         /**

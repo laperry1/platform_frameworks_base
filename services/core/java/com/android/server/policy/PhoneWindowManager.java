@@ -609,6 +609,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     boolean mVolumeRockerWake;
 
+    boolean mPartialScreenshot;
+
     int mPointerLocationMode = 0; // guarded by mLock
 
     // The last window we were told about in focusChanged.
@@ -1154,6 +1156,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ANBI_ENABLED), false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.RECENTS_LAYOUT_STYLE), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SCREENSHOT_DEFAULT_MODE), false, this,
+                    UserHandle.USER_ALL);
             updateSettings();
         }
 
@@ -1538,7 +1546,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private boolean isDozeMode() {
         IDreamManager dreamManager = getDreamManager();
         try {
-            if (dreamManager != null && dreamManager.isDozing()) {
+            if (dreamManager != null && dreamManager.isDreaming()) {
                 return true;
             }
         } catch (RemoteException e) {
@@ -2172,11 +2180,19 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
 
         mOPGestures = new OPGesturesListener(context, new OPGesturesListener.Callbacks() {
-                    @Override
-                    public void onSwipeThreeFinger() {
-                        mHandler.post(mScreenshotRunnable);
-                    }
-                });
+            @Override
+            public void onSwipeThreeFinger() {
+                if (mPartialScreenshot) {
+                    mHandler.removeCallbacks(mScreenshotRunnable);
+                    mScreenshotRunnable.setScreenshotType(TAKE_SCREENSHOT_SELECTED_REGION);
+                    mHandler.post(mScreenshotRunnable);
+                } else {
+                    mHandler.removeCallbacks(mScreenshotRunnable);
+                    mScreenshotRunnable.setScreenshotType(TAKE_SCREENSHOT_FULLSCREEN);
+                    mHandler.post(mScreenshotRunnable);
+                }
+            }
+        });
 
         mHandler = new PolicyHandler();
         mWakeGestureListener = new MyWakeGestureListener(mContext, mHandler);
@@ -2630,6 +2646,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // volume rocker wake
             mVolumeRockerWake = Settings.System.getIntForUser(resolver,
                     Settings.System.VOLUME_ROCKER_WAKE, 0, UserHandle.USER_CURRENT) != 0;
+
+            mPartialScreenshot = Settings.System.getIntForUser(resolver,
+                    Settings.System.SCREENSHOT_DEFAULT_MODE, 0, UserHandle.USER_CURRENT) == 1;
 
             // Configure wake gesture.
             boolean wakeGestureEnabledSetting = Settings.Secure.getIntForUser(resolver,
@@ -7029,15 +7048,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             return false;
         }
 
-        IDreamManager dreamManager = getDreamManager();
-        try {
-            if (dreamManager != null && dreamManager.isDozing()) {
-                if (event != null && isVolumeKey(event)) {
-                    return false;
-                }
+        boolean isDozing = isDozeMode();
+
+        if (isDozing) {
+            if (event != null && isVolumeKey(event)) {
+                return false;
             }
-        } catch (RemoteException e) {
-            Slog.e(TAG, "RemoteException when checking if dreaming", e);
         }
 
         // Send events to keyguard while the screen is on and it's showing.
@@ -7055,12 +7071,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         // Send events to a dozing dream even if the screen is off since the dream
         // is in control of the state of the screen.
-        try {
-            if (dreamManager != null && dreamManager.isDreaming()) {
-                return true;
-            }
-        } catch (RemoteException e) {
-            Slog.e(TAG, "RemoteException when checking if dreaming", e);
+        if (isDozing) {
+            return true;
         }
 
         // Otherwise, consume events since the user can't see what is being
@@ -7238,8 +7250,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Intent.ACTION_SCREENSHOT.equals(intent.getAction())) {
-                mHandler.removeCallbacks(mScreenshotRunnable);
-                mHandler.post(mScreenshotRunnable);
+                if (mPartialScreenshot) {
+                    mHandler.removeCallbacks(mScreenshotRunnable);
+                    mScreenshotRunnable.setScreenshotType(TAKE_SCREENSHOT_SELECTED_REGION);
+                    mHandler.post(mScreenshotRunnable);
+                } else {
+                    mHandler.removeCallbacks(mScreenshotRunnable);
+                    mScreenshotRunnable.setScreenshotType(TAKE_SCREENSHOT_FULLSCREEN);
+                    mHandler.post(mScreenshotRunnable);
+                }
             }
         }
     };
@@ -7442,7 +7461,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mWindowManagerDrawComplete = false;
             mScreenOnListener = screenOnListener;
 
-            if (mKeyguardDelegate != null) {
+            if (mKeyguardDelegate != null && mKeyguardDelegate.hasKeyguard()) {
                 mHandler.removeMessages(MSG_KEYGUARD_DRAWN_TIMEOUT);
                 mHandler.sendEmptyMessageDelayed(MSG_KEYGUARD_DRAWN_TIMEOUT,
                         getKeyguardDrawnTimeout());
@@ -7450,7 +7469,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             } else {
                 if (DEBUG_WAKEUP) Slog.d(TAG,
                         "null mKeyguardDelegate: setting mKeyguardDrawComplete.");
-                finishKeyguardDrawn();
+                mHandler.sendEmptyMessage(MSG_KEYGUARD_DRAWN_COMPLETE);
             }
         }
     }
