@@ -23,6 +23,7 @@ import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Rect;
 
+import android.os.Handler;
 import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.provider.Settings;
@@ -84,16 +85,17 @@ public class RecentsConfiguration {
     /** Misc **/
     public boolean fakeShadows;
     public int svelteLevel;
-    private Context mContext;
 
     // Whether this product supports Grid-based Recents. If this is field is set to true, then
     // Recents will layout task views in a grid mode when there's enough space in the screen.
-    private boolean isGridEnabled;
+    public boolean isGridEnabledDefault;
+    public boolean mIsGridEnabled;
 
     // Support for Android Recents for low ram devices. If this field is set to true, then Recents
     // will use the alternative layout.
     public boolean isLowRamDevice;
     public boolean isLowRamDeviceDefault;
+    public boolean mIsGoLayoutEnabled;
 
     // Enable drag and drop split from Recents. Disabled for low ram devices.
     public boolean dragToSplitEnabled;
@@ -104,23 +106,51 @@ public class RecentsConfiguration {
     public int fabEnterAnimDelay;
     public int fabExitAnimDuration;
 
+    private Handler mHandler = new Handler();
+    private SettingsObserver mSettingsObserver;
+
+    private class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            mAppContext.getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.RECENTS_LAYOUT_STYLE),
+                    false, this);
+            update();
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            update();
+        }
+
+        public void update() {
+            mIsGridEnabled = Settings.System.getIntForUser(mAppContext.getContentResolver(),
+                    Settings.System.RECENTS_LAYOUT_STYLE, isGridEnabledDefault ? 1 : 0,
+                    UserHandle.USER_CURRENT) == 1;
+            mIsGoLayoutEnabled = Settings.System.getIntForUser(mAppContext.getContentResolver(),
+                    Settings.System.RECENTS_LAYOUT_STYLE, isLowRamDeviceDefault ? 2 : 0,
+                    UserHandle.USER_CURRENT) == 2;
+        }
+    }
+
     public RecentsConfiguration(Context context) {
         // Load only resources that can not change after the first load either through developer
         // settings or via multi window
         SystemServicesProxy ssp = Recents.getSystemServices();
         mAppContext = context.getApplicationContext();
         Resources res = mAppContext.getResources();
-        mContext = mAppContext;
         fakeShadows = res.getBoolean(R.bool.config_recents_fake_shadows);
         svelteLevel = res.getInteger(R.integer.recents_svelte_level);
-        isGridEnabled = SystemProperties.getBoolean("ro.recents.grid", false);
+
+        mSettingsObserver = new SettingsObserver(mHandler);
+        mSettingsObserver.observe();
+        isGridEnabledDefault = SystemProperties.getBoolean("ro.recents.grid", false);
         isLowRamDeviceDefault = ActivityManager.isLowRamDeviceStatic();
-        if (isGoLayoutEnabled() == true) {
-            isLowRamDevice = true;
-        } else { 
-            isLowRamDevice = isLowRamDeviceDefault;
-        }
-        dragToSplitEnabled = !isLowRamDevice;
+        isLowRamDevice = mIsGoLayoutEnabled;
+        dragToSplitEnabled = mIsGoLayoutEnabled? true : !isLowRamDeviceDefault;
 
         float screenDensity = context.getResources().getDisplayMetrics().density;
         smallestWidth = ssp.getDeviceSmallestWidth();
@@ -159,12 +189,7 @@ public class RecentsConfiguration {
     }
 
     public boolean isGridEnabled() {
-        return Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.RECENTS_LAYOUT_STYLE, isGridEnabled ? 1 : 0, UserHandle.USER_CURRENT) == 1;
-    }
-    public boolean isGoLayoutEnabled() {
-        return Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.RECENTS_LAYOUT_STYLE, isLowRamDeviceDefault ? 2 : 0, UserHandle.USER_CURRENT) == 2;
+        return mIsGridEnabled;
     }
 
 }
