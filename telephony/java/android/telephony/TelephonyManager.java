@@ -4347,6 +4347,8 @@ public class TelephonyManager {
             return;
         }
 
+        Rlog.d(TAG, "setTelephonyProperty: success phoneId=" + phoneId +
+                " property=" + property + " value: " + value + " propVal=" + propVal);
         SystemProperties.set(property, propVal);
     }
 
@@ -4622,7 +4624,7 @@ public class TelephonyManager {
             ITelephony telephony = getITelephony();
             if (telephony == null)
                 return null;
-            return telephony.getForbiddenPlmns(subId, appType);
+            return telephony.getForbiddenPlmns(subId, appType, mContext.getOpPackageName());
         } catch (RemoteException ex) {
             return null;
         } catch (NullPointerException ex) {
