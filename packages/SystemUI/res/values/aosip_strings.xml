@@ -165,6 +165,7 @@
     <!-- Screenrecord notification action: Stop -->
     <string name="screenrecord_notif_stop">Stop</string>
     <string name="screenrecord_notif_completed">Screen recorded successfully</string>
+    <string name="screenrecord_notif_description">Tap to view your screen recording</string>
     <!-- Screenrecord notification action: show/hide pointer -->
     <string name="screenrecord_notif_pointer_on">Show pointer</string>
     <string name="screenrecord_notif_pointer_off">Hide pointer</string>
@@ -199,6 +200,11 @@
     <string name="quick_settings_compass_SW">SW</string>
     <string name="quick_settings_compass_W">W</string>
     <string name="quick_settings_compass_NW">NW</string>
+
+    <!-- LTE QS Tile -->
+    <string name="qs_lte_label">LTE</string>
+    <string name="lte_on">LTE ON </string>
+    <string name="lte_off">LTE OFF</string>
 
     <!-- Expanded desktop QS Tile -->
     <string name="quick_settings_expanded_desktop_label">Expanded desktop</string>
