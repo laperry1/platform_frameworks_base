@@ -612,6 +612,11 @@ public interface WindowManagerPolicy {
         void notifyKeyguardTrustedChanged();
 
         /**
+         * The keyguard showing state has changed
+         */
+        void onKeyguardShowingAndNotOccludedChanged();
+
+        /**
          * Notifies the window manager that screen is being turned off.
          *
          * @param listener callback to call when display can be turned off
@@ -1755,4 +1760,18 @@ public interface WindowManagerPolicy {
      * Call screen record from WindowManager.
      */
     public void screenRecordAction(int mode);
+
+    /**
+     * Check if gesture navigation is enable.
+     *
+     * @return true if enable; false otherwise.
+     */
+    boolean isGestureButtonEnabled();
+
+    /**
+     * Check if current touch move is in gestu.
+     *
+     * @return true if enable; false otherwise.
+     */
+    boolean isGestureButtonRegion(int i, int i2);
 }

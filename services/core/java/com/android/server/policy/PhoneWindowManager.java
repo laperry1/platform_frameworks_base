@@ -202,7 +202,6 @@ import android.service.dreams.DreamManagerInternal;
 import android.service.dreams.DreamService;
 import android.service.dreams.IDreamManager;
 import android.service.vr.IPersistentVrStateCallbacks;
-import android.service.gesture.EdgeGestureManager;
 import android.speech.RecognizerIntent;
 import android.telecom.TelecomManager;
 import android.util.DisplayMetrics;
@@ -253,8 +252,6 @@ import com.android.internal.policy.IKeyguardService;
 import com.android.internal.policy.IShortcutService;
 import com.android.internal.policy.PhoneWindow;
 import com.android.internal.statusbar.IStatusBarService;
-import com.android.internal.util.gesture.EdgeGesturePosition;
-import com.android.internal.util.gesture.EdgeServiceConstants;
 import com.android.internal.util.ScreenShapeHelper;
 import com.android.internal.utils.du.ActionHandler;
 import com.android.internal.utils.du.DUActionUtils;
@@ -845,6 +842,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     // Maps global key codes to the components that will handle them.
     private GlobalKeyManager mGlobalKeyManager;
 
+    // omni gestures
+    private boolean mUseGestureButton;
+    private GestureButton mGestureButton;
+    private boolean mGestureButtonRegistered;
+
     // Fallback actions by key code.
     private final SparseArray<KeyCharacterMap.FallbackAction> mFallbackActions =
             new SparseArray<KeyCharacterMap.FallbackAction>();
@@ -1177,8 +1179,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.Secure.SYSTEM_NAVIGATION_KEYS_ENABLED), false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.USE_EDGE_SERVICE_FOR_GESTURES), false, this,
+                    Settings.System.USE_BOTTOM_GESTURE_NAVIGATION), false, this,
                     UserHandle.USER_ALL);
+
             updateSettings();
         }
 
@@ -1273,67 +1276,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     private SystemGesturesPointerEventListener mSystemGestures;
     private OPGesturesListener mOPGestures;
-
-    private EdgeGestureManager.EdgeGestureActivationListener mEdgeGestureActivationListener
-            = new EdgeGestureManager.EdgeGestureActivationListener() {
-
-        @Override
-        public void onEdgeGestureActivation(int touchX, int touchY,
-                EdgeGesturePosition position, int flags) {
-            WindowState target = null;
-
-            if (position == EdgeGesturePosition.TOP) {
-                target = mStatusBar;
-            } else if ((position == EdgeGesturePosition.BOTTOM) && (mNavigationBarPosition == NAV_BAR_BOTTOM)) {
-                target = mNavigationBar;
-            } else if ((position == EdgeGesturePosition.RIGHT) && (mNavigationBarPosition == NAV_BAR_RIGHT)) {
-                target = mNavigationBar;
-            } else if ((position == EdgeGesturePosition.LEFT) && (mNavigationBarPosition == NAV_BAR_LEFT)) {
-                target = mNavigationBar;
-            }
-
-            if (target != null) {
-                requestTransientBars(target);
-                dropEventsUntilLift();
-                mEdgeListenerActivated = true;
-            } else {
-                restoreListenerState();
-            }
-        }
-    };
-    private EdgeGestureManager mEdgeGestureManager = null;
-    private int mLastEdgePositions = 0;
-    private boolean mEdgeListenerActivated = false;
-    private boolean mUsingEdgeGestureServiceForGestures = false;
-
-    private void updateEdgeGestureListenerState() {
-        int flags = 0;
-        if (mUsingEdgeGestureServiceForGestures) {
-            flags = EdgeServiceConstants.LONG_LIVING | EdgeServiceConstants.UNRESTRICTED;
-            if (mStatusBar != null && !mStatusBar.isVisibleLw()) {
-                flags |= EdgeGesturePosition.TOP.FLAG;
-            }
-            if (mNavigationBar != null && !mNavigationBar.isVisibleLw()
-                     && !isStatusBarKeyguard()) {
-                if (mNavigationBarPosition == NAV_BAR_BOTTOM) {
-                    flags |= EdgeGesturePosition.BOTTOM.FLAG;
-                } else if (mNavigationBarPosition == NAV_BAR_RIGHT){
-                    flags |= EdgeGesturePosition.RIGHT.FLAG;
-                } else if (mNavigationBarPosition == NAV_BAR_LEFT) {
-                    flags |= EdgeGesturePosition.LEFT.FLAG;
-                }
-            }
-        }
-        if (mEdgeListenerActivated) {
-            mEdgeGestureActivationListener.restoreListenerState();
-            mEdgeListenerActivated = false;
-        }
-        if (flags != mLastEdgePositions) {
-            mEdgeGestureManager.updateEdgeGestureActivationListener(mEdgeGestureActivationListener,
-                    flags);
-            mLastEdgePositions = flags;
-        }
-    }
 
     IStatusBarService getStatusBarService() {
         synchronized (mServiceAquireLock) {
@@ -2185,7 +2127,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
-    private void handleLongPressOnHome(int deviceId) {
+    protected void handleLongPressOnHome(int deviceId) {
         if (mLongPressOnHomeBehavior == LONG_PRESS_HOME_NOTHING) {
             return;
         }
@@ -2579,6 +2521,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     public void onTrustedChanged() {
                         mWindowManagerFuncs.notifyKeyguardTrustedChanged();
                     }
+
+                    @Override
+                    public void onShowingChanged() {
+                        mWindowManagerFuncs.onKeyguardShowingAndNotOccludedChanged();
+                    }
                 });
 
         String deviceKeyHandlerLib = mContext.getResources().getString(
@@ -2814,19 +2761,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 updateOrientationListenerLp();
             }
 
-            final boolean useEdgeService = Settings.System.getIntForUser(resolver,
-                    Settings.System.USE_EDGE_SERVICE_FOR_GESTURES, 1, UserHandle.USER_CURRENT) == 1;
-            if (useEdgeService ^ mUsingEdgeGestureServiceForGestures && mSystemReady) {
-                if (!mUsingEdgeGestureServiceForGestures && useEdgeService) {
-                    mUsingEdgeGestureServiceForGestures = true;
-                    mWindowManagerFuncs.unregisterPointerEventListener(mSystemGestures);
-                } else if (mUsingEdgeGestureServiceForGestures && !useEdgeService) {
-                    mUsingEdgeGestureServiceForGestures = false;
-                    mWindowManagerFuncs.registerPointerEventListener(mSystemGestures);
-                }
-                updateEdgeGestureListenerState();
-            }
-
             if (mSystemReady) {
                 int pointerLocation = Settings.System.getIntForUser(resolver,
                         Settings.System.POINTER_LOCATION, 0, UserHandle.USER_CURRENT);
@@ -2880,6 +2814,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mTorchActionMode = Settings.Secure.getIntForUser(resolver,
                     Settings.Secure.TORCH_POWER_BUTTON_GESTURE, 0,
                     UserHandle.USER_CURRENT);
+            mUseGestureButton = Settings.System.getIntForUser(resolver,
+                    Settings.System.USE_BOTTOM_GESTURE_NAVIGATION, 0,
+                    UserHandle.USER_CURRENT) != 0;
         }
 
         synchronized (mWindowManagerFuncs.getWindowManagerLock()) {
@@ -2888,7 +2825,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (updateRotation) {
             updateRotation(true);
         }
-        
+
+        if (mUseGestureButton && !mNavbarVisible && !mGestureButtonRegistered) {
+            mGestureButton = new GestureButton(mContext, this);
+            mWindowManagerFuncs.registerPointerEventListener(mGestureButton);
+            mGestureButtonRegistered = true;
+        }
+        if (mGestureButtonRegistered && !mUseGestureButton) {
+            mWindowManagerFuncs.unregisterPointerEventListener(mGestureButton);
+            mGestureButtonRegistered = false;
+        }
     }
 
     private void updateNavigationBarSize() {
@@ -4657,7 +4603,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         return mSearchManager;
     }
 
-    private void preloadRecentApps() {
+    protected void preloadRecentApps() {
         mPreloadedRecentApps = true;
         StatusBarManagerInternal statusbar = getStatusBarManagerInternal();
         if (statusbar != null) {
@@ -4665,7 +4611,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
-    private void cancelPreloadRecentApps() {
+    protected void cancelPreloadRecentApps() {
         if (mPreloadedRecentApps) {
             mPreloadedRecentApps = false;
             StatusBarManagerInternal statusbar = getStatusBarManagerInternal();
@@ -4675,7 +4621,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
-    private void toggleRecentApps() {
+    protected void toggleRecentApps() {
         mPreloadedRecentApps = false; // preloading no longer needs to be canceled
         StatusBarManagerInternal statusbar = getStatusBarManagerInternal();
         if (statusbar != null) {
@@ -4858,8 +4804,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     public int adjustSystemUiVisibilityLw(int visibility) {
         mStatusBarController.adjustSystemUiVisibilityLw(mLastSystemUiFlags, visibility);
         mNavigationBarController.adjustSystemUiVisibilityLw(mLastSystemUiFlags, visibility);
-
-        updateEdgeGestureListenerState();
 
         // Reset any bits in mForceClearingStatusBarVisibility that
         // are now clear.
@@ -5090,6 +5034,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             updateSysUiVisibility |= layoutStatusBar(pf, df, of, vf, dcf, sysui, isKeyguardShowing);
             if (updateSysUiVisibility) {
                 updateSystemUiVisibilityLw();
+            }
+
+            if (!mNavbarVisible && mUseGestureButton && mGestureButton != null) {
+                mGestureButton.navigationBarPosition(displayWidth, displayHeight, displayRotation);
             }
         }
     }
@@ -6250,7 +6198,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         // update since mAllowLockscreenWhenOn might have changed
         updateLockScreenTimeout();
-        updateEdgeGestureListenerState();
         return changes;
     }
 
@@ -8181,9 +8128,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (mVrManagerInternal != null) {
             mVrManagerInternal.addPersistentVrModeStateListener(mPersistentVrModeListener);
         }
-        mEdgeGestureManager = EdgeGestureManager.getInstance();
-        mEdgeGestureManager.setEdgeGestureActivationListener(mEdgeGestureActivationListener);
-        mSettingsObserver.observe();
 
         mANBIHandler = new ANBIHandler(mContext);
 
@@ -9397,5 +9341,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         Message msg = mHandler.obtainMessage(MSG_DISPATCH_VOLKEY_SKIP_TRACK, keyCode, 0);
         msg.setAsynchronous(true);
         mHandler.sendMessageDelayed(msg, ViewConfiguration.getLongPressTimeout());
+    }
+
+    public boolean isGestureButtonRegion(int x, int y) {
+        if (!mUseGestureButton || mGestureButton == null) {
+            return false;
+        }
+        return mGestureButton.isGestureButtonRegion(x, y);
+    }
+
+    public boolean isGestureButtonEnabled() {
+        return mUseGestureButton;
     }
 }
