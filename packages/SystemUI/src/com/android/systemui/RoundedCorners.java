@@ -53,22 +53,18 @@ public class RoundedCorners extends SystemUI implements Tunable {
     private View mOverlay;
     private View mBottomOverlay;
     private float mDensity;
-    /*private TunablePadding mQsPadding;
+    private TunablePadding mQsPadding;
     private TunablePadding mStatusBarPadding;
-    private TunablePadding mNavBarPadding;*/
+    private TunablePadding mNavBarPadding;
 
     @Override
     public void start() {
         mRoundedDefault = mContext.getResources().getDimensionPixelSize(
                 R.dimen.rounded_corner_radius);
-        if (mRoundedDefault != 0) {
-            setupRounding();
-        }
+        setupRounding();
         int padding = mContext.getResources().getDimensionPixelSize(
                 R.dimen.rounded_corner_content_padding);
-        int qsPadding = mContext.getResources().getDimensionPixelSize(
-                R.dimen.qs_corner_content_padding);
-        setupPadding(padding, qsPadding);
+        setupPadding(padding);
     }
 
     private void setupRounding() {
@@ -131,23 +127,19 @@ public class RoundedCorners extends SystemUI implements Tunable {
         });
     }
 
-    private void setupPadding(int padding, int qsPadding) {
+    private void setupPadding(int padding) {
         // Add some padding to all the content near the edge of the screen.
         StatusBar sb = getComponent(StatusBar.class);
         View statusBar = (sb != null ? sb.getStatusBarWindow() : null);
         if (statusBar != null) {
-            FragmentHostManager fragmentHostManager = FragmentHostManager.get(statusBar);
-            if (padding != 0) {
-                TunablePadding.addTunablePadding(statusBar.findViewById(R.id.keyguard_header), PADDING,
-                        padding, FLAG_END);
+            TunablePadding.addTunablePadding(statusBar.findViewById(R.id.keyguard_header), PADDING,
+                    padding, FLAG_END);
 
-                fragmentHostManager.addTagListener(CollapsedStatusBarFragment.TAG,
-                        new TunablePaddingTagListener(padding, R.id.status_bar));
-            }
-            if (qsPadding != 0) {
-                fragmentHostManager.addTagListener(QS.TAG,
-                        new TunablePaddingTagListener(qsPadding, R.id.header));
-            }
+            FragmentHostManager fragmentHostManager = FragmentHostManager.get(statusBar);
+            fragmentHostManager.addTagListener(CollapsedStatusBarFragment.TAG,
+                    new TunablePaddingTagListener(padding, R.id.status_bar));
+            fragmentHostManager.addTagListener(QS.TAG,
+                    new TunablePaddingTagListener(padding, R.id.header));
         }
     }
 
