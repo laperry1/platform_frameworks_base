@@ -1750,10 +1750,6 @@ public final class Settings {
             return true;
         }
 
-        public int getCurrentGeneration() {
-            return mCurrentGeneration;
-        }
-
         private int readCurrentGeneration() {
             try {
                 return mArray.get(mIndex);
@@ -1862,7 +1858,6 @@ public final class Settings {
 
         public String getStringForUser(ContentResolver cr, String name, final int userHandle) {
             final boolean isSelf = (userHandle == UserHandle.myUserId());
-            int currentGeneration = -1;
             if (isSelf) {
                 synchronized (NameValueCache.this) {
                     if (mGenerationTracker != null) {
@@ -1875,9 +1870,6 @@ public final class Settings {
                             mValues.clear();
                         } else if (mValues.containsKey(name)) {
                             return mValues.get(name);
-                        }
-                        if (mGenerationTracker != null) {
-                            currentGeneration = mGenerationTracker.getCurrentGeneration();
                         }
                     }
                 }
@@ -1969,10 +1961,7 @@ public final class Settings {
                                         });
                                     }
                                 }
-                                if (mGenerationTracker != null && currentGeneration ==
-                                        mGenerationTracker.getCurrentGeneration()) {
-                                    mValues.put(name, value);
-                                }
+                                mValues.put(name, value);
                             }
                         } else {
                             if (LOCAL_LOGV) Log.i(TAG, "call-query of user " + userHandle
@@ -2013,10 +2002,7 @@ public final class Settings {
 
                 String value = c.moveToNext() ? c.getString(0) : null;
                 synchronized (NameValueCache.this) {
-                    if(mGenerationTracker != null &&
-                            currentGeneration == mGenerationTracker.getCurrentGeneration()) {
-                        mValues.put(name, value);
-                    }
+                    mValues.put(name, value);
                 }
                 if (LOCAL_LOGV) {
                     Log.v(TAG, "cache miss [" + mUri.getLastPathSegment() + "]: " +
@@ -4255,6 +4241,13 @@ public final class Settings {
          * @hide
          */
         public static final String ANBI_ENABLED = "anbi_enabled";
+
+        /**
+         * Whether to enable status and navigation bar color in battery saver mode.
+         *
+         * @hide
+         */
+        public static final String BATTERY_SAVER_MODE_COLOR = "battery_save_mode_color";
 
         /**
          * Whether to display the reboot option on the power menu
